@@ -92,6 +92,10 @@ leave_group
   - `client_table`
   - `group_table`:
   - `ack_dict`:
+- locks
+    - send_socket_lock
+    - group_table_lock
+    - ack_dict_lock 
 
 ### Client
 - sockets
@@ -103,6 +107,9 @@ leave_group
 - maintain variables
   - `client_table`
   - `ack_dict`
+- locks
+    - send_socket_lock
+    - ack_dict_lock
   
 ### Diagram
 
