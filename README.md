@@ -98,6 +98,7 @@ leave_group
     maintain client information (name, IP, port number, online status)
   - `group_table`:  
     maintain group information (name, members set)
+    NOTE: I allow offline members to keep being in group table, no matter they leave silently or send explicit deregistration request. The server may try to broadcast group messages to offline members, and since offline members never reply acks, the server will then find out and remove them from group tables.
   - `ack_dict`:  
     record acknowledgement requirements of group members, for each group message which is uniquely indentified by (`sender_name`, `message timestamp`)
 - locks
@@ -168,4 +169,61 @@ message:
 
 
 ## Test Cases
+### Test Cases 1,2,3
 see `test.txt`
+
+### Test Case 4
+1. Server starts
+1. Client X register with port 7771
+1. A new client Y tries to regitser with port 7771. Fail because of duplicated port number.
+1. A new client Y tries to regitser with port 77777. Fail because of port number out of range.
+1. A new client Y tries to regitser with port 777a. Fail because of invalid port number.
+1. A new client trites to register with port 7772, but named X. Fail because duplicated name.
+
+Server 
+```
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -s 6666
+>>> Server is online
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}}
+```
+
+X
+```
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c X localhost 6666 7771
+>>> Client start listening
+>>> Registration request sent
+>>> 
+>>> Welcome, You are registered.
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}}
+>>>                                            
+```
+
+A new client trying to register:
+```
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c Y 127.0.0.1 6666 7771
+Traceback (most recent call last):
+  File "ChatApp.py", line 926, in <module>
+    client = Client(name, server_ip, server_listen_port, client_listen_port)
+  File "ChatApp.py", line 436, in __init__
+    self.client_listen_socket.bind((self.host, self.client_listen_port))
+OSError: [Errno 98] Address already in use
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c Y 127.0.0.1 6666 77777
+Invalid client port number
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c Y 127.0.0.1 6666 777a
+Invalid client port number
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c X 127.0.0.1 6666 7772
+>>> Client start listening
+>>> Registration request sent
+>>> 
+>>> Someone has already used this name. Try another one.ol2251@csee4119-ol2251-instance-1:~$ 
+```
+
+### Test Case 5
+
+
+### Test Case 6
+
+
+### Test Case 7
