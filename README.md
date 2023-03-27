@@ -908,7 +908,7 @@ ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c Z 127.0.0.1 6666 7773
 
 Server:
 ```
-ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp-v2.py -s 6666
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -s 6666
 >>> Server is online
 >>> Client table updated.
 {'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}}
@@ -938,7 +938,7 @@ ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp-v2.py -s 6666
 
 X:
 ```
-ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp-v2.py -c X 127.0.0.1 6666 7771
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c X 127.0.0.1 6666 7771
 >>> Client start listening
 >>> Registration request sent
 >>> 
@@ -968,7 +968,7 @@ ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp-v2.py -c X 127.0.0.1 6666 7
 
 Y:
 ```
-ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp-v2.py -c Y 127.0.0.1 6666 7772
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c Y 127.0.0.1 6666 7772
 >>> Client start listening
 >>> Registration request sent
 >>> 
@@ -992,7 +992,7 @@ ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp-v2.py -c Y 127.0.0.1 6666 7
 
 Z:
 ```
-ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp-v2.py -c Z 127.0.0.1 6666 7773
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c Z 127.0.0.1 6666 7773
 >>> Client start listening
 >>> Registration request sent
 >>> 
