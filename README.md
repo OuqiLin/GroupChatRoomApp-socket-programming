@@ -21,7 +21,7 @@ python3 ChatApp.py -c <client-name> <server-ip> <server-listen-port> <client-lis
 # example:
 python3 ChatApp.py -c X localhost 6666 7771
 ```
-Note: Client name does not support `;`.
+Note: `;` is not allowed in client name.
 
 ### Functions of Client
 
@@ -31,7 +31,7 @@ Client can deregistrate itself by either method
     ```python
     dereg <client-name>
     ```
-2.  press `CTRL+C``
+2.  press `CTRL+C`
 3.  close the CLI window  
 
 Note: Client can only dereg itself.
@@ -47,6 +47,7 @@ Client can create a group chat room.
 ```python
 create_group <group-name>
 ```
+Note: `;` is not allowed in group name.
 
 #### List Existing Groups
 Client can know all available groups before joining.
@@ -79,7 +80,7 @@ leave_group
 ```
 
 ## Program Design
-### Server 
+### Server Components
 - sockets
   - listening socket
   - receiving socket
@@ -97,21 +98,37 @@ leave_group
     - group_table_lock
     - ack_dict_lock 
 
-### Client
-- sockets
-  - listening socket
-  - receiving socket
+### Client Components
 - threads
-  - listening thread: sitting aside main thread, listening to all kinds of incoming messages
-  - keyboard thread (main thread): keep taking user inputs
+  - keyboard thread (main thread) `clientMode()`: 
+    1. continue taking user inputs
+    1. verify user input is a valid command
+    1. structure the sending-out packet format
+    1. use `client_send_socket` to send packet to server or another client, wait 500msec for ack, retry for 5 times
+    1. based on server or another client's ack and additional information, perform corresponding actions
+  - listening thread `clientListen()`: start before keyboard thread, sitting aside main thread, listening to all kinds of incoming messages
+    - acknowledgements
+    - client table broadcasted from server
+    - group message broadcasted from server
+    - private message sent from another client
+- sockets
+  - sending socket:  
+    is used in the keyboard thread `clientMode()`, and listening thread `clientListen()` when need to reply ack for group messages and private messages
+  - listening socket:  
+    is used in the listening thread `clientListen()`
 - maintain variables
-  - `client_table`
-  - `ack_dict`
+  - `client_table`: maintain client information (name, IP, port number, online status)
+  - `ack_dict`: record  requirement
+  - `pri_msg_queue`: 
 - locks
     - send_socket_lock
     - ack_dict_lock
   
 ### Diagram
+<img src="client.jpg">
+<img src="server.jpg">
+
+### Packet Format
 
 ### Known Bugs
 
