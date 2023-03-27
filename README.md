@@ -471,17 +471,23 @@ ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c A localhost 6666 7774
 >>> 
 ```
 
-### Test Case 4
-1. Server starts
-1. Client X register with port 7771
-1. A new client Y tries to regitser with port 7771. Fail because of duplicated port number.
-1. A new client Y tries to regitser with port 77777. Fail because of port number out of range.
-1. A new client Y tries to regitser with port 777a. Fail because of invalid port number.
-1. A new client Y tries to regitser with server IP 127.0.9999.1. Fail because of invalid IP.
-1. A new client trites to register with port 7772, but named X. Fail because duplicated name.
+### Test Case 4 -- valid registration information
+1. Server tries to start with port 65536, fail because of port number out of range.
+2. Server tries to start with port 666a, fail because of invalid port number.
+3. Server starts with port 6666
+4. Client X register with port 7771
+5. A new client Y tries to regitser with port 7771. Fail because of duplicated port number.
+6. A new client Y tries to regitser with port 77777. Fail because of port number out of range.
+7. A new client Y tries to regitser with port 777a. Fail because of invalid port number.
+8. A new client Y tries to regitser with server IP 127.0.9999.1. Fail because of invalid IP.
+9. A new client trites to register with port 7772, but named X. Fail because duplicated name.
 
 Server 
 ```
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -s 65536
+Invalid server port number
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -s 666a
+Invalid server port number
 ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -s 6666
 >>> Server is online
 >>> Client table updated.
@@ -490,30 +496,30 @@ ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -s 6666
 
 X
 ```
-ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c X localhost 6666 7771
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c X 127.0.0.1 6666 7771
 >>> Client start listening
 >>> Registration request sent
 >>> 
 >>> Welcome, You are registered.
 >>> Client table updated.
 {'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}}
->>>                                            
+>>>                                
 ```
 
 A new client trying to register:
 ```
-ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c Y 127.0.0.1 6666 7771
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c Y localhost 6666 7771
 Traceback (most recent call last):
   File "ChatApp.py", line 926, in <module>
     client = Client(name, server_ip, server_listen_port, client_listen_port)
   File "ChatApp.py", line 436, in __init__
     self.client_listen_socket.bind((self.host, self.client_listen_port))
 OSError: [Errno 98] Address already in use
-ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c Y 127.0.0.1 6666 77777
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c Y localhost 6666 77777
 Invalid client port number
-ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c Y 127.0.0.1 6666 777a
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c Y localhost 6666 777a
 Invalid client port number
-ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c Y 127.0.9999.1 6666 7772
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c Y 127.0.9999.1 6666 777a
 Invalid server ip address. Try again.
 ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c X 127.0.0.1 6666 7772
 >>> Client start listening
@@ -522,10 +528,368 @@ ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c X 127.0.0.1 6666 7772
 >>> Someone has already used this name. Try another one.ol2251@csee4119-ol2251-instance-1:~$ 
 ```
 
-### Test Case 5
+### Test Case 5 -- dereg behaviors
+1. Server starts
+2. client X starts
+3. client Y starts
+4. Y tries to dereg X, fail
+5. client X create group roomA
+6. client X join group roomA
+7. Y sends private message to X, X doesn't print out message right away
+8. **X dereg itself, before actual exits, X first print out private message from Y, then exit**
 
+Server:
+```
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -s 6666
+>>> Server is online
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}}
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}}
+>>> Client X created group roomA successfully
+>>> Group table updated.
+{'roomA': set()}
+>>> Client X joined group roomA
+>>> Group table updated.
+{'roomA': {'X'}}
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': False}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}}
+```
 
-### Test Case 6
+X:
+```
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c X localhost 6666 7771
+>>> Client start listening
+>>> Registration request sent
+>>> 
+>>> Welcome, You are registered.
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}}
+>>> 
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}}
+>>> create_group roomA
 
+>>> Group roomA created by Server.
+>>> join_group roomA
 
-### Test Case 7
+>>> Entered group roomA successfully
+>>> (roomA) dereg X
+
+>>> You are Offline. Bye.
+>>> Y: hello, I am y ol2251@csee4119-ol2251-instance-1:~$ 
+```
+
+Y:
+```
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c Y 127.0.0.1 6666 7772
+>>> Client start listening
+>>> Registration request sent
+>>> 
+>>> Welcome, You are registered.
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}}
+>>> dereg X
+
+>>> Invalid command
+>>> send X hello, I am y
+
+>>> Message received by X.
+>>> 
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': False}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}}
+>>> 
+```
+
+### Test Case 6 -- server offline, group member behavior
+1. Server starts
+2. client X starts
+3. client Y starts
+4. X create group roomA
+6. X join group roomA
+7. Y sends private message to X, X doesn't print out message right away
+8. **Server goes down **
+9. **X tries to send group message, find out server is down, X will print out Y's private message before actual exiting**
+
+Server:
+```
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -s 6666
+>>> Server is online
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}}
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}}
+>>> Client X created group roomA successfully
+>>> Group table updated.
+{'roomA': set()}
+>>> Client X joined group roomA
+>>> Group table updated.
+{'roomA': {'X'}}
+^CTraceback (most recent call last):
+  File "ChatApp-v2.py", line 879, in <module>
+    server.serverMode()
+  File "ChatApp-v2.py", line 137, in serverMode
+    in_packet, addr = self.server_listen_socket.recvfrom(4096)
+KeyboardInterrupt
+ol2251@csee4119-ol2251-instance-1:~$ 
+```
+
+X:
+```
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c X 127.0.0.1 6666 7771
+>>> Client start listening
+>>> Registration request sent
+>>> 
+>>> Welcome, You are registered.
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}}
+>>> 
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}}
+>>> create_group roomA
+
+>>> Group roomA created by Server.
+>>> join_group roomA
+
+>>> Entered group roomA successfully
+>>> (roomA) send_group hello everyone
+
+>>> (roomA) Server not responding
+>>> (roomA) Exiting
+>>> Y: hello this is msg1 
+>>> Y: hello this is msg 2 ol2251@csee4119-ol2251-instance-1:~$ 
+```
+
+Y:
+```
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c Y 127.0.0.1 6666 7772
+>>> Client start listening
+>>> Registration request sent
+>>> 
+>>> Welcome, You are registered.
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}}
+>>> send X hello this is msg1
+
+>>> Message received by X.
+>>> send X hello this is msg 2
+
+>>> Message received by X.
+>>> 
+```
+
+### Test Case 7 -- group behaviors, dereg then send group messgage
+1. Server starts
+2. client X starts
+3. X's sequential behavior:
+    1.   create group roomA
+    2.   create group roomA again, fail because of duplicate room name
+    3.   create group roomB;, fail because ';' is not allowed
+    4.   create group roomB
+    6.   join group roomC, fail because roomC does not exist
+    7.   join group roomA
+    8.   send group message, no one will print out this message, because only X in roomA
+4. client Y starts
+5. Y's sequential behavior:
+    1.  list groups
+    2.  join group roomA
+    3.  send group message, X will print out this message
+    4.  create group roomD, fail because in groupMode, this is an invalid command
+    5.  list groups, fail because in groupMode, this is an invalid command
+    6.  join group roomB, fail because in groupMode, this is an invalid command
+    7.  send private message to X, fail because in groupMode, this is an invalid command
+6. client Z starts
+    1.  send roomA group message, fail because in NormalModel, this is an invalid command
+    2.  list group members, fail because in NormalModel, this is an invalid command
+    3.  leave group, fail because in NormalModel, this is an invalid command
+    4.  list groups
+    5.  join group roomA
+    6.  send group message, X and Y will print out this message
+    7.  dereg itself
+7. Y's sequential behavior
+    1.  send group message, X will print out this message, Z will not because already offline
+8. Server tries to broadcast message to Z, but find out Z no reply, so remove Z from group table A.
+9. Server exit 
+10. X tries to send group message, but find out Server already offline, so X exits as well.
+
+Server:
+```
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -s 6666
+>>> Server is online
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}}
+>>> Client X created group roomA successfully
+>>> Group table updated.
+{'roomA': set()}
+>>> Client X creating group roomA failed, group already exists
+>>> Client X created group roomB successfully
+>>> Group table updated.
+{'roomA': set(), 'roomB': set()}
+>>> Client X joining group roomC failed, group does not exist
+>>> Client X joined group roomA
+>>> Group table updated.
+{'roomA': {'X'}, 'roomB': set()}
+>>> Client X sent group message: Hello, is anyone there? 
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}}
+>>> Client Y requested listing groups, current groups:
+>>> roomA
+>>> roomB
+>>> Client Y joined group roomA
+>>> Group table updated.
+{'roomA': {'X', 'Y'}, 'roomB': set()}
+>>> Client Y sent group message: Hello everyone in roomA, I am Y 
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}, 'Z': {'ip': '127.0.0.1', 'port': 7773, 'online': True}}
+>>> Client Z requested listing groups, current groups:
+>>> roomA
+>>> roomB
+>>> Client Z joined group roomA
+>>> Group table updated.
+{'roomA': {'X', 'Y', 'Z'}, 'roomB': set()}
+>>> Client Z sent group message: Hello everyone, I am Z, nice to meet you all 
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}, 'Z': {'ip': '127.0.0.1', 'port': 7773, 'online': False}}
+>>> Client Y sent group message: How many people are still here? I think only X and me 
+>>> Client Z not responsive, removed from roomA
+>>> Group table updated.
+{'roomA': {'X', 'Y'}, 'roomB': set()}
+^CTraceback (most recent call last):
+  File "ChatApp-v2.py", line 879, in <module>
+    server.serverMode()
+  File "ChatApp-v2.py", line 137, in serverMode
+    in_packet, addr = self.server_listen_socket.recvfrom(4096)
+KeyboardInterrupt
+ol2251@csee4119-ol2251-instance-1:~$ 
+```
+
+X:
+```
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c X 127.0.0.1 6666 7771
+>>> Client start listening
+>>> Registration request sent
+>>> 
+>>> Welcome, You are registered.
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}}
+>>> create_group roomA
+
+>>> Group roomA created by Server.
+>>> create_group roomA
+
+>>> Group roomA already exists.
+>>> create_group roomB;
+
+>>> Group name should not contain ';'. Try again.
+>>> create_group roomB
+
+>>> Group roomB created by Server.
+>>> join_group roomC
+
+>>> Group roomC does not exist
+>>> join_group roomA
+
+>>> Entered group roomA successfully
+>>> (roomA) send_group Hello, is anyone there?
+
+>>> (roomA) Message received by Server.
+>>> (roomA) 
+>>> (roomA) Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}}
+>>> (roomA) 
+>>> (roomA) Group_Message Y: Hello everyone in roomA, I am Y 
+>>> (roomA) 
+>>> (roomA) Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}, 'Z': {'ip': '127.0.0.1', 'port': 7773, 'online': True}}
+>>> (roomA) 
+>>> (roomA) Group_Message Z: Hello everyone, I am Z, nice to meet you all 
+>>> (roomA) 
+>>> (roomA) Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}, 'Z': {'ip': '127.0.0.1', 'port': 7773, 'online': False}}
+>>> (roomA) 
+>>> (roomA) Group_Message Y: How many people are still here? I think only X and me 
+>>> (roomA) send_group haha yeah I think only us two
+
+>>> (roomA) Server not responding
+>>> (roomA) Exitingol2251@csee4119-ol2251-instance-1:~$ 
+```
+
+Y:
+```
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c Y 127.0.0.1 6666 7772
+>>> Client start listening
+>>> Registration request sent
+>>> 
+>>> Welcome, You are registered.
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}}
+>>> list_groups
+
+>>> Available group chats:
+>>> roomA
+>>> roomB
+>>> join_group roomA
+
+>>> Entered group roomA successfully
+>>> (roomA) send_group Hello everyone in roomA, I am Y
+
+>>> (roomA) Message received by Server.
+>>> (roomA) create_group roomD
+
+>>> Invalid command
+>>> (roomA) list_groups
+
+>>> Invalid command
+>>> (roomA) join_group roomB
+
+>>> Invalid command
+>>> (roomA) send X hello X, can you hear me?
+
+>>> Invalid command
+>>> (roomA) 
+>>> (roomA) Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}, 'Z': {'ip': '127.0.0.1', 'port': 7773, 'online': True}}
+>>> (roomA) 
+>>> (roomA) Group_Message Z: Hello everyone, I am Z, nice to meet you all 
+>>> (roomA) 
+>>> (roomA) Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}, 'Z': {'ip': '127.0.0.1', 'port': 7773, 'online': False}}
+>>> (roomA) send_group How many people are still here? I think only X and me
+
+>>> (roomA) Message received by Server.
+>>> (roomA) 
+```
+
+Z:
+```
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c Z 127.0.0.1 6666 7773
+>>> Client start listening
+>>> Registration request sent
+>>> 
+>>> Welcome, You are registered.
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}, 'Z': {'ip': '127.0.0.1', 'port': 7773, 'online': True}}
+>>> send_group can I send group message?
+
+>>> Invalid command
+>>> list_members
+
+>>> Invalid command
+>>> leave_group
+
+>>> Invalid command
+>>> list_groups
+
+>>> Available group chats:
+>>> roomA
+>>> roomB
+>>> join_group roomA
+
+>>> Entered group roomA successfully
+>>> (roomA) send_group Hello everyone, I am Z, nice to meet you all
+
+>>> (roomA) Message received by Server.
+>>> (roomA) dereg Z
+
+>>> You are Offline. Bye.ol2251@csee4119-ol2251-instance-1:~$ 
+```
