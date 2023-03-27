@@ -678,7 +678,7 @@ ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c Y 127.0.0.1 6666 7772
 >>> 
 ```
 
-### Test Case 7 -- group behaviors, dereg then send group messgage
+### Test Case 7 -- group behaviors, valid command check
 1. Server starts
 2. client X starts
 3. X's sequential behavior:
@@ -892,4 +892,120 @@ ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c Z 127.0.0.1 6666 7773
 >>> (roomA) dereg Z
 
 >>> You are Offline. Bye.ol2251@csee4119-ol2251-instance-1:~$ 
+```
+
+
+### Test Case 8 -- once leaved a group, will not receive group message anymore
+1. Server starts
+2. X starts
+3. Y starts
+4. Z starts
+5. X create group roomA
+6. X, Y, Z join group roomA
+7. X send group message, Y, Z will print out
+8. **Z leave group roomA**
+9. Y send group message, X will receive, but **Z will not receive**
+
+Server:
+```
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp-v2.py -s 6666
+>>> Server is online
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}}
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}}
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}, 'Z': {'ip': '127.0.0.1', 'port': 7773, 'online': True}}
+>>> Client X created group roomA successfully
+>>> Group table updated.
+{'roomA': set()}
+>>> Client X joined group roomA
+>>> Group table updated.
+{'roomA': {'X'}}
+>>> Client Y joined group roomA
+>>> Group table updated.
+{'roomA': {'Y', 'X'}}
+>>> Client Z joined group roomA
+>>> Group table updated.
+{'roomA': {'Y', 'Z', 'X'}}
+>>> Client X sent group message: hello everyone 
+>>> Client Z left group
+>>> Group table updated.
+{'roomA': {'Y', 'X'}}
+>>> Client Y sent group message: hello X, nice to meet you 
+```
+
+
+X:
+```
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp-v2.py -c X 127.0.0.1 6666 7771
+>>> Client start listening
+>>> Registration request sent
+>>> 
+>>> Welcome, You are registered.
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}}
+>>> 
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}}
+>>> 
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}, 'Z': {'ip': '127.0.0.1', 'port': 7773, 'online': True}}
+>>> create_group roomA
+
+>>> Group roomA created by Server.
+>>> join_group roomA
+
+>>> Entered group roomA successfully
+>>> (roomA) send_group hello everyone
+
+>>> (roomA) Message received by Server.
+>>> (roomA)      
+>>> (roomA) Group_Message Y: hello X, nice to meet you 
+>>> (roomA) 
+```
+
+
+Y:
+```
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp-v2.py -c Y 127.0.0.1 6666 7772
+>>> Client start listening
+>>> Registration request sent
+>>> 
+>>> Welcome, You are registered.
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}}
+>>> 
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}, 'Z': {'ip': '127.0.0.1', 'port': 7773, 'online': True}}
+>>> join_group roomA
+
+>>> Entered group roomA successfully
+>>> (roomA) 
+>>> (roomA) Group_Message X: hello everyone 
+>>> (roomA) send_group hello X, nice to meet you
+
+>>> (roomA) Message received by Server.
+>>> (roomA) 
+```
+
+
+Z:
+```
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp-v2.py -c Z 127.0.0.1 6666 7773
+>>> Client start listening
+>>> Registration request sent
+>>> 
+>>> Welcome, You are registered.
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}, 'Z': {'ip': '127.0.0.1', 'port': 7773, 'online': True}}
+>>> join_group roomA
+
+>>> Entered group roomA successfully
+>>> (roomA) 
+>>> (roomA) Group_Message X: hello everyone 
+>>> (roomA) leave_group
+
+>>> Leave group chat roomA
+>>> 
 ```
