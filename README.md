@@ -169,8 +169,307 @@ message:
 
 
 ## Test Cases
-### Test Cases 1,2,3
-see `test.txt`
+### Test Cases 1
+Server 
+```
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -s 6666
+>>> Server is online
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}}
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}}
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}, 'Z': {'ip': '127.0.0.1', 'port': 7773, 'online': True}}
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': False}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}, 'Z': {'ip': '127.0.0.1', 'port': 7773, 'online': True}}
+```
+
+X:
+```
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c X 127.0.0.1 6666 7771
+>>> Client start listening
+>>> Registration request sent
+>>> 
+>>> Welcome, You are registered.
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}}
+>>> 
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}}
+>>> 
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}, 'Z': {'ip': '127.0.0.1', 'port': 7773, 'online': True}}
+>>> send Y hello, I am X
+
+>>> Message received by Y.
+>>> 
+>>> Y: hello, I am Y, nice to meet you 
+>>> send Z hello, this is X, are you Z?
+
+>>> Message received by Z.
+>>> 
+>>> Z: yes, this is Z. nice to meet you~ 
+>>> dereg X
+
+>>> You are Offline. Bye.
+```
+
+Y:
+```
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c Y localhost 6666 7772
+>>> Client start listening
+>>> Registration request sent
+>>> 
+>>> Welcome, You are registered.
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}}
+>>> 
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}, 'Z': {'ip': '127.0.0.1', 'port': 7773, 'online': True}}
+>>> 
+>>> X: hello, I am X 
+>>> send X hello, I am Y, nice to meet you
+
+>>> Message received by X.
+>>> send Z hello Z, I am Y
+
+>>> Message received by Z.
+>>> 
+>>> Z: sure. Hope you have a nice day 
+>>> 
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': False}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}, 'Z': {'ip': '127.0.0.1', 'port': 7773, 'online': True}}
+>>> send X hello X, are you still there?
+
+>>> No ACK from X, message not delivered
+>>> Report this issue to server
+>>> ^Col2251@csee4119-ol2251-instance-1:~$ 
+```
+
+Z:
+```
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c Z localhost 6666 7773
+>>> Client start listening
+>>> Registration request sent
+>>> 
+>>> Welcome, You are registered.
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}, 'Z': {'ip': '127.0.0.1', 'port': 7773, 'online': True}}
+>>> 
+>>> X: hello, this is X, are you Z? 
+>>> send X yes, this is Z. nice to meet you~
+
+>>> Message received by X.
+>>> 
+>>> Y: hello Z, I am Y 
+>>> send Y sure. Hope you have a nice day
+
+>>> Message received by Y.
+>>> 
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': False}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}, 'Z': {'ip': '127.0.0.1', 'port': 7773, 'online': True}}
+>>> send X hello X, I am Z, are you still there?
+
+>>> No ACK from X, message not delivered
+>>> Report this issue to server
+>>> ^Col2251@csee4119-ol2251-instance-1:~$ 
+```
+
+### Test Case 2 (updated version, consistent with https://edstem.org/us/courses/35445/discussion/2838367)
+Server:
+```
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -s 6666
+>>> Server is online
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}}
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}}
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}, 'Z': {'ip': '127.0.0.1', 'port': 7773, 'online': True}}
+^CTraceback (most recent call last):
+  File "ChatApp.py", line 884, in <module>
+    server.serverMode()
+  File "ChatApp.py", line 145, in serverMode
+    in_packet, addr = self.server_listen_socket.recvfrom(4096)
+KeyboardInterrupt
+```
+
+X:
+```
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c X 127.0.0.1 6666 7771
+>>> Client start listening
+>>> Registration request sent
+>>> 
+>>> Welcome, You are registered.
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}}
+>>> 
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}}
+>>> 
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}, 'Z': {'ip': '127.0.0.1', 'port': 7773, 'online': True}}
+>>> send Z this is a private message, you should receive although server is offline
+
+>>> Message received by Z.
+>>> 
+```
+
+Y:
+```
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c Y localhost 6666 7772
+>>> Client start listening
+>>> Registration request sent
+>>> 
+>>> Welcome, You are registered.
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}}
+>>> 
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}, 'Z': {'ip': '127.0.0.1', 'port': 7773, 'online': True}}
+>>> dereg Y
+
+>>> Server not responding
+>>> Exitingol2251@csee4119-ol2251-instance-1:~$ 
+
+```
+
+Z:
+```
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c Z localhost 6666 7773
+>>> Client start listening
+>>> Registration request sent
+>>> 
+>>> Welcome, You are registered.
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}, 'Z': {'ip': '127.0.0.1', 'port': 7773, 'online': True}}
+>>> 
+>>> X: this is a private message, you should receive although server is offline 
+>>> 
+```
+
+### Test Case 3
+Server:
+```
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -s 6666
+>>> Server is online
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}}
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}}
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}, 'Z': {'ip': '127.0.0.1', 'port': 7773, 'online': True}}
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}, 'Z': {'ip': '127.0.0.1', 'port': 7773, 'online': True}, 'A': {'ip': '127.0.0.1', 'port': 7774, 'online': True}}
+>>> Client X created group roomA successfully
+>>> Group table updated.
+{'roomA': set()}
+>>> Client X joined group roomA
+>>> Group table updated.
+{'roomA': {'X'}}
+>>> Client Y joined group roomA
+>>> Group table updated.
+{'roomA': {'Y', 'X'}}
+>>> Client Z joined group roomA
+>>> Group table updated.
+{'roomA': {'Y', 'X', 'Z'}}
+>>> Client X sent group message: hello everyone, I am X 
+>>> Client Z left group
+>>> Group table updated.
+{'roomA': {'Y', 'X'}}
+```
+
+X:
+```
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c X 127.0.0.1 6666 7771
+>>> Client start listening
+>>> Registration request sent
+>>> 
+>>> Welcome, You are registered.
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}}
+>>> 
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}}
+>>> 
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}, 'Z': {'ip': '127.0.0.1', 'port': 7773, 'online': True}}
+>>> 
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}, 'Z': {'ip': '127.0.0.1', 'port': 7773, 'online': True}, 'A': {'ip': '127.0.0.1', 'port': 7774, 'online': True}}
+>>> create_group roomA
+
+>>> Group roomA created by Server.
+>>> join_group roomA
+
+>>> Entered group roomA successfully
+>>> (roomA) send_group hello everyone, I am X
+
+>>> (roomA) Message received by Server.
+>>> (roomA) 
+```
+
+Y:
+```
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c Y localhost 6666 7772
+>>> Client start listening
+>>> Registration request sent
+>>> 
+>>> Welcome, You are registered.
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}}
+>>> 
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}, 'Z': {'ip': '127.0.0.1', 'port': 7773, 'online': True}}
+>>> 
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}, 'Z': {'ip': '127.0.0.1', 'port': 7773, 'online': True}, 'A': {'ip': '127.0.0.1', 'port': 7774, 'online': True}}
+>>> join_group roomA
+
+>>> Entered group roomA successfully
+>>> (roomA) 
+>>> (roomA) Group_Message X: hello everyone, I am X 
+>>> (roomA) 
+```
+
+Z:
+```
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c Z localhost 6666 7773
+>>> Client start listening
+>>> Registration request sent
+>>> 
+>>> Welcome, You are registered.
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}, 'Z': {'ip': '127.0.0.1', 'port': 7773, 'online': True}}
+>>> 
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}, 'Z': {'ip': '127.0.0.1', 'port': 7773, 'online': True}, 'A': {'ip': '127.0.0.1', 'port': 7774, 'online': True}}
+>>> join_group roomA
+
+>>> Entered group roomA successfully
+>>> (roomA) 
+>>> (roomA) Group_Message X: hello everyone, I am X 
+>>> (roomA) leave_group
+
+>>> Leave group chat roomA
+>>> A: hello Z, I am A, I am not in the group. You should receive this msg later 
+>>> 
+```
+
+A:
+```
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c A localhost 6666 7774
+>>> Client start listening
+>>> Registration request sent
+>>> 
+>>> Welcome, You are registered.
+>>> Client table updated.
+{'X': {'ip': '127.0.0.1', 'port': 7771, 'online': True}, 'Y': {'ip': '127.0.0.1', 'port': 7772, 'online': True}, 'Z': {'ip': '127.0.0.1', 'port': 7773, 'online': True}, 'A': {'ip': '127.0.0.1', 'port': 7774, 'online': True}}
+>>> send Z hello Z, I am A, I am not in the group. You should receive this msg later
+
+>>> Message received by Z.
+>>> 
+```
 
 ### Test Case 4
 1. Server starts
@@ -178,6 +477,7 @@ see `test.txt`
 1. A new client Y tries to regitser with port 7771. Fail because of duplicated port number.
 1. A new client Y tries to regitser with port 77777. Fail because of port number out of range.
 1. A new client Y tries to regitser with port 777a. Fail because of invalid port number.
+1. A new client Y tries to regitser with server IP 127.0.9999.1. Fail because of invalid IP.
 1. A new client trites to register with port 7772, but named X. Fail because duplicated name.
 
 Server 
@@ -213,6 +513,8 @@ ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c Y 127.0.0.1 6666 7777
 Invalid client port number
 ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c Y 127.0.0.1 6666 777a
 Invalid client port number
+ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c Y 127.0.9999.1 6666 7772
+Invalid server ip address. Try again.
 ol2251@csee4119-ol2251-instance-1:~$ python3 ChatApp.py -c X 127.0.0.1 6666 7772
 >>> Client start listening
 >>> Registration request sent
