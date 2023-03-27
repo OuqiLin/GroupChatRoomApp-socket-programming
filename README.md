@@ -81,22 +81,32 @@ leave_group
 
 ## Program Design
 ### Server Components
-- sockets
-  - listening socket
-  - receiving socket
 - threads
-  - main thread: keep listening to 
-  - sub threads: 
-    - each time server need to respond, create a sub-thread
-    - a thread for waiting for acks of group messages
-- maintain variables
-  - `client_table`
-  - `group_table`:
-  - `ack_dict`:
+  - main thread `serverMode()`:  
+    keep listening to all kinds of incoming client command requests, and clients' ack reply of group messages.
+  - sub threads : 
+    - `serverRespond()`: each time server need to respond (e.g. broadcast table, send ack,...), create a sub-thread
+    - `sleep_and_wait_for_acks()`: Server needs to receive acks from group members. After server finished sening out a group message, a sub-thread will start. It will first sleep for 500msec, then wake up to check if required acks are received. 
+- sockets
+  - listening socket:  
+    is used in main thread `serverMode()`
+  - sending socket:  
+    is used in each sub-thread `serverRespond()` and in main thread `serverMode()` when broadcasting group messages.
+    
+- major variables
+  - `client_table`:  
+    maintain client information (name, IP, port number, online status)
+  - `group_table`:  
+    maintain group information (name, members set)
+  - `ack_dict`:  
+    record acknowledgement requirements of group members, for each group message which is uniquely indentified by (`sender_name`, `message timestamp`)
 - locks
-    - send_socket_lock
-    - group_table_lock
-    - ack_dict_lock 
+    - `send_lock`:  
+        will take effects each time `server_send_socket` is used.
+    - `group_lock`:  
+        will take effects each time `group_table` is read or written (e.g. create new groups, add new members, remove nonresponsive members).
+    - `ack_lock`:  
+        will take effects when new ack requirements are added, modified and deleted.
 
 ### Client Components
 - threads
@@ -116,19 +126,43 @@ leave_group
     is used in the keyboard thread `clientMode()`, and listening thread `clientListen()` when need to reply ack for group messages and private messages
   - listening socket:  
     is used in the listening thread `clientListen()`
-- maintain variables
-  - `client_table`: maintain client information (name, IP, port number, online status)
-  - `ack_dict`: record  requirement
-  - `pri_msg_queue`: 
+- major variables
+  - `client_table`:  
+    maintain client information (name, IP, port number, online status)
+  - `ack_dict`:  
+    record acknowledgement requirements of server and all clients, default `False`; if received ack, change to `True`
+  - `pri_msg_queue`:  
+    when client in group mode, the private messages it received will be kept in `pri_msg_queue`
 - locks
-    - send_socket_lock
-    - ack_dict_lock
+    - `send_lock`:  
+        will take effects each time `client_send_socket` is used.
+    - `ack_lock`:  
+        will take effects when keyboard thread is trying to read, and when listening thread is trying to write.
   
 ### Diagram
 <img src="client.jpg">
 <img src="server.jpg">
 
 ### Packet Format
+All packets will be wrapped in a uniform formats, including client requests, ack response, broadcast tables, etc.
+```
+sender_listening_port:
+<sender_listening_port>
+sender_name:
+<sender_name>
+msg_type:
+<reg_ack/ack/table/grp_msg/pri_msg> (client may receive)
+<reg/dereg/create_group/list_groups/join_group/leave_group/list_members/send_group/ack/kick> (server may receive)
+message:
+<actual message>
+```
+
+- `sender_name`:  
+    uniquely identify an instance, is used as a unique user id in this implementation. Server's "sender_name" is "server". Client's "sender_name" is the name provided when register. Therefore, I disallow duplicate name for client registration.
+- `msg_type`:
+    In order to identify the packet content sending between instances and direct to the corresponding actions, I use this `msg_type` field as part of the packet header.  
+    - Client may receive: `reg_ack` registration request acknowledgement; `ack` from server and other clients; `table` client_table broadcasted from server; `grp_msg` group message broadcasted from server; `pri_msg` private message sent from another client.
+    - Server may receive: `reg/dereg/create_group/list_groups/join_group/leave_group/list_members/send_group` corresponding to every client function. `ack` from group members receiving group messages. `kick` when client A find client B not responding to A's message, A will notify server to change B's status to offline.
 
 ### Known Bugs
 
